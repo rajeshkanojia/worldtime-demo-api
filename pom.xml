@@ -31,7 +31,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<cloudHubDeployment>
-						<username>rajesh_mulesoft_1</username>
+						<username>rajesh_mulesoft_01</username>
 						<environment>sandbox</environment>
 						<workers>1</workers>
 						<workerType>Micro</workerType>
