@@ -39,7 +39,6 @@
 						<password>Ragini@143</password>
 						<muleVersion>7.10.0</muleVersion>
 					</cloudHubDeployement>
-					
 				</configuration>
 			</plugin>
 		</plugins>
