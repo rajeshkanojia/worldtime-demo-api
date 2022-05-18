@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<configuration-properties doc:name="Configuration properties" doc:id="62a5f710-e0f3-40ae-8b1f-6ad21aae3896" file="config.yaml" />
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="a304b13b-c56c-409a-810f-2fb8c9705dbe" basePath="${http.basepath}" >
 		<http:listener-connection host="${http.host}" port="${http.port}" />
@@ -13,13 +14,13 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 	</http:request-config>
 	<flow name="worldtime-demo-apiFlow" doc:id="76514ca3-0fea-466c-a15b-d76e70c9c612" >
 		<http:listener doc:name="Listener" doc:id="b3f9a7b4-98b5-49c3-bbe8-4d29295b00bb" config-ref="HTTP_Listener_config" path="/{region}/{city}"/>
-		<http:request method="GET" doc:name="Request" doc:id="c30b5b55-5de7-4691-abac-b1df61cbc219" config-ref="HTTP_Request_configuration" path="/{region}/{city}">
-			<http:uri-params ><![CDATA[#[output application/java
+		<ee:transform doc:name="Transform Message" doc:id="c10e7e18-b275-41f8-a250-fa6d8b58c5be" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
 ---
-{
-	"region" : attributes.uriParams.region,
-	"city" : attributes.uriParams.city
-}]]]></http:uri-params>
-		</http:request>
+attributes]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 	</flow>
 </mule>
