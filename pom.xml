@@ -30,7 +30,7 @@
 				<version>${mule.maven.plugin.version}</version>
 				<extensions>true</extensions>
 				<configuration>
-					<cloudHubDeployement>
+					<cloudHubDeployment>
 						<username>rajesh_mulesoft_1</username>
 						<environment>sandbox</environment>
 						<workers>1</workers>
@@ -38,7 +38,7 @@
 						<applicationName>worldtimezone-service</applicationName>
 						<password>Ragini@143</password>
 						<muleVersion>7.10.0</muleVersion>
-					</cloudHubDeployement>
+					</cloudHubDeployment>
 				</configuration>
 			</plugin>
 		</plugins>
