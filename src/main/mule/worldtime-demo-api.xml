@@ -44,9 +44,10 @@ output application/json
 (attributes.requestUri splitBy("/") filter(value, index) -> value != "")[3]]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<choice doc:name="Choice" doc:id="9cd5c3c7-b89b-4d3e-927f-b22808b317e3" >
+		<choice doc:name="Choice" doc:id="9cd5c3c7-b89b-4d3e-927f-b22808b317e3" >		
 			<when expression='#[vars.timezone == "timezone"]'>
 				<choice doc:name="Choice" doc:id="f06eaa5a-1cbb-4c03-8311-ceb5cbcab67d">
+				
 			<when expression="#[vars.area != null]">
 						<set-variable value='#[vars.timezone ++ "/" ++ vars.region ++ "/" ++ vars.area]' doc:name="Set Request URL" doc:id="60e10db8-02d8-4263-aeec-15fbf29d585e" variableName="requestURI"/>
 			</when>
@@ -68,6 +69,12 @@ output application/json
 				</ee:transform>
 			</otherwise>
 		</choice>
+				<choice doc:name="Choice" doc:id="45c43c15-7afc-459b-828b-b3b49c1215dc">
+					<when expression='#[vars.region == "america" and vars.subarea != null]'>
+						<set-variable value='#[vars.timezone ++ "/" ++ vars.region ++ "/" ++ vars.area ++ "/" ++ vars.subarea]' doc:name="Set Request URL" doc:id="b7f3176a-64f6-4887-b4a9-cb99a0cd91b6" variableName="requestURI"/>
+					</when>
+				</choice>
+				<logger level="INFO" doc:name="Logger" doc:id="f90de9f5-55f6-439c-b82d-1f6cf0afbf16" message='#[{"requestURI" : vars.requestURI}]'/>
 				<http:request method="GET" doc:name="Request" doc:id="c080bd9c-b687-4acf-b7c8-b981177df5e9" config-ref="WorldTime" path="#[vars.requestURI]"/>
 				<ee:transform doc:name="Transform Message" doc:id="e926a2f3-7f83-4fab-a7e0-feee24065b03" >
 					<ee:message >
