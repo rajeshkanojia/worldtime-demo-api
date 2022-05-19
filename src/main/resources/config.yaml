@@ -1,4 +1,8 @@
 http:
-  host: "0.0.0.0"
+  host: "localhost"
   port: "8081"
   basepath: "timezone"
+worldtime:
+  host: "www.worldtimeapi.org"
+  basepath: "/api/timezone"
+ 

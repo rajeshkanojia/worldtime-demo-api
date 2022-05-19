@@ -6,21 +6,88 @@
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<configuration-properties doc:name="Configuration properties" doc:id="62a5f710-e0f3-40ae-8b1f-6ad21aae3896" file="config.yaml" />
-	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="a304b13b-c56c-409a-810f-2fb8c9705dbe" basePath="${http.basepath}" >
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="a304b13b-c56c-409a-810f-2fb8c9705dbe" basePath="/">
 		<http:listener-connection host="${http.host}" port="${http.port}" />
 	</http:listener-config>
-	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="56a23cfb-f051-48ce-8adc-f62edea99b7a" basePath="/api/timezone/" >
-		<http:request-connection host="worldtimeapi.org" />
+	<http:request-config name="WorldTime" doc:name="HTTP Request configuration" doc:id="3be08ae7-712c-4ddf-8632-9f588c75cccc" basePath="/api/" >
+		<http:request-connection host="www.worldtimeapi.org" />
 	</http:request-config>
 	<flow name="worldtime-demo-apiFlow" doc:id="76514ca3-0fea-466c-a15b-d76e70c9c612" >
-		<http:listener doc:name="Listener" doc:id="b3f9a7b4-98b5-49c3-bbe8-4d29295b00bb" config-ref="HTTP_Listener_config" path="/{region}/{city}"/>
-		<ee:transform doc:name="Transform Message" doc:id="c10e7e18-b275-41f8-a250-fa6d8b58c5be" >
+		<http:listener doc:name="Listener" doc:id="b3f9a7b4-98b5-49c3-bbe8-4d29295b00bb" config-ref="HTTP_Listener_config" path="/*"/>
+		<ee:transform doc:name="set variables" doc:id="56a4c830-b3c8-4a55-b50a-2611c5d3af42" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
-attributes]]></ee:set-payload>
+payload
+
+]]></ee:set-payload>
 			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="timezone" ><![CDATA[%dw 2.0
+output application/json
+---
+(attributes.requestUri splitBy("/") filter(value, index) -> value != "")[0]
+]]></ee:set-variable>
+				<ee:set-variable variableName="region" ><![CDATA[%dw 2.0
+output application/json
+---
+(attributes.requestUri splitBy("/") filter(value, index) -> value != "")[1]]]></ee:set-variable>
+				<ee:set-variable variableName="area" ><![CDATA[%dw 2.0
+output application/json
+---
+(attributes.requestUri splitBy("/") filter(value, index) -> value != "")[2]
+]]></ee:set-variable>
+				<ee:set-variable variableName="subarea" ><![CDATA[%dw 2.0
+output application/json
+---
+(attributes.requestUri splitBy("/") filter(value, index) -> value != "")[3]]]></ee:set-variable>
+			</ee:variables>
 		</ee:transform>
+		<choice doc:name="Choice" doc:id="9cd5c3c7-b89b-4d3e-927f-b22808b317e3" >
+			<when expression='#[vars.timezone == "timezone"]'>
+				<choice doc:name="Choice" doc:id="f06eaa5a-1cbb-4c03-8311-ceb5cbcab67d">
+			<when expression="#[vars.area != null]">
+						<set-variable value='#[vars.timezone ++ "/" ++ vars.region ++ "/" ++ vars.area]' doc:name="Set Request URL" doc:id="60e10db8-02d8-4263-aeec-15fbf29d585e" variableName="requestURI"/>
+			</when>
+
+			<when expression="#[vars.region != null]">
+						<set-variable value='#[vars.timezone ++ "/" ++ vars.region]' doc:name="Set Request URL" doc:id="73aed4d0-f47a-4dc2-9d57-1767d351c27d" variableName="requestURI" />
+			</when>
+			<when expression="#[vars.timezone != null]">
+						<set-variable value='#[vars.timezone]' doc:name="Set Request URL" doc:id="34fa5b89-9365-4d6c-8de5-d2cdfb49a520" variableName="requestURI" />
+			</when>
+					<otherwise>
+				<ee:transform doc:name="Transform Message" doc:id="3e1cb4fb-3df9-46d8-8102-76e00d61c724">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+"default"]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+				<http:request method="GET" doc:name="Request" doc:id="c080bd9c-b687-4acf-b7c8-b981177df5e9" config-ref="WorldTime" path="#[vars.requestURI]"/>
+				<ee:transform doc:name="Transform Message" doc:id="e926a2f3-7f83-4fab-a7e0-feee24065b03" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="7fd27869-267c-449c-88a8-46284c3df362" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"invalid URI"]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
 	</flow>
 </mule>
