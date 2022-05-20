@@ -3,7 +3,4 @@ http:
   cloudhub: "0.0.0.0."
   port: "8081"
   basepath: "timezone"
-worldtime:
-  host: "www.worldtimeapi.org"
-  basepath: "/api/timezone"
  
