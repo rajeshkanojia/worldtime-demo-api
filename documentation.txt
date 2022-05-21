@@ -1,0 +1,21 @@
+######################## Secure Configuration Properties ########################
+1:		Download secure-properties-tool.jar file from https://docs.mulesoft.com/downloads/mule-runtime/4.2/secure-properties-tool.jar
+2:		Run Command java -cp secure-properties-tool.jar com.mulesoft.tools.SecurePropertiesTool <method> <operation> <algorithm> <mode> <key> <value> --use-random-iv [optional]
+		ex:- java -cp secure-properties-tool.jar com.mulesoft.tools.SecurePropertiesTool string encrypt Blowfish CBC mulesoft "some value to encrypt"
+3:		Create a .properties or .yaml file in src/main/resource folder.
+3.1:	Define secure properties in the file by enclosing the encrypted values between the sequence ![value]
+4:		In Mule project download and add Secure Properties module.
+5:		Click on Global Elements tab then Create button
+5.1:	Connector Config > Secure_Properties_Config
+5.2:	map the config/property file and fill the password and other fields.
+
+######################## enable https protocal ########################
+To enable https we need keystore.jks file and modify the TLS settings
+1:		Move to java folder through cmd.
+2:		run the command
+		keytool -genkeypair -keystore C:\Users\Rajesh\Documents\mulesoft\mule.jks -dname "CN=localhost, OU=Unknown, O=Unknown, L=Unknown, ST=Unknown, C=Unknown"  -keypass password  -storepass password  -keyalg RSA  -sigalg SHA1withRSA  -keysize 2048  -alias mule  -ext SAN=DNS:localhost,IP:127.0.0.1 -validity 9999
+		*C:\Users\Rajesh\Documents\mulesoft\mule.jks :- location where you want to store the generated file.
+		*-keypass password  
+		*-storepass password
+3:		Open the https listener module and click on TLS tab add the details in Key Store Configuration section.
+4:		Replace the port value with ${https.port} otherwise it gives error		 
