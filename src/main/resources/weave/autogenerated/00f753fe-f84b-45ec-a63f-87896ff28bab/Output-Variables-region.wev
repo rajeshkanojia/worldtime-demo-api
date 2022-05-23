@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_00f753fe_f84b_45ec_a63f_87896ff28bab_Output_Variables_region = String
+

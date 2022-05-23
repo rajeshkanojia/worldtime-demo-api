@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="timezone_Flow" doc:id="00f753fe-f84b-45ec-a63f-87896ff28bab">
+		<set-variable value='#[%dw 2.0&#10;output application/dw&#10;---&#10;(vars.inputData.timeZone splitBy(".") filter((item, index) -&gt; item != ""))[0] as String]' doc:name="Set Variable" doc:id="a95e5f7a-d2da-49b9-897c-570cdd9b5189" variableName="prepareRequestURI"/>
+		<choice doc:name="Choice" doc:id="8bef6fd5-d566-46c4-9d39-f8130112bdf7" >
+			<when expression='#[vars.prepareRequestURI == "timezone"]'>
+				<http:request method="GET" doc:name="Request" doc:id="b39afd75-c8ec-422c-9c0b-02bf45592c4d" config-ref="WorldTime" path="#[vars.prepareRequestURI]" />
+				<choice doc:name="Choice" doc:id="fa9564b5-3324-4ab4-90db-c2df12020f7c" >
+					<when expression='#[vars.inputData.extension == "xml"]'>
+						<ee:transform doc:name="Transform Message" doc:id="361c6b5f-ca5f-4e1c-8281-5063919a4d27" >
+							<ee:message >
+								<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+
+payload
+]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+					</when>
+					<when expression='#[vars.inputData.extension == "csv"]'>
+						<ee:transform doc:name="Transform Message" doc:id="b8443d2d-0637-425d-8ab3-f4e6d927376a" >
+							<ee:message >
+								<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+					</when>
+					<when expression='#[vars.inputData.extension == "json"]'>
+						<ee:transform doc:name="Transform Message" doc:id="db49ab8a-6961-4135-8cb1-32cb785f7214" >
+							<ee:message >
+								<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+					</when>
+					<otherwise>
+						<parse-template doc:name="Parse Template" doc:id="fa688b2f-c334-43c0-b5f8-e206233e0e3a" location="html\list.html"/>
+					</otherwise>
+				</choice>
+			</when>
+		</choice>
+	</flow>
+</mule>
