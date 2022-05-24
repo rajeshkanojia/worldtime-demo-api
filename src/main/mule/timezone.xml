@@ -28,10 +28,9 @@ output application/xml
 						<ee:transform doc:name="Transform Message" doc:id="b8443d2d-0637-425d-8ab3-f4e6d927376a" >
 							<ee:message >
 								<ee:set-payload ><![CDATA[%dw 2.0
-output application/java
+output application/csv
 ---
-{
-}]]></ee:set-payload>
+payload]]></ee:set-payload>
 							</ee:message>
 						</ee:transform>
 					</when>
