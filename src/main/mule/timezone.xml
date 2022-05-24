@@ -9,7 +9,9 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 		<set-variable value='#[%dw 2.0&#10;output application/dw&#10;---&#10;(vars.inputData.timeZone splitBy(".") filter((item, index) -&gt; item != ""))[0] as String]' doc:name="Set Variable" doc:id="a95e5f7a-d2da-49b9-897c-570cdd9b5189" variableName="prepareRequestURI"/>
 		<choice doc:name="Choice" doc:id="8bef6fd5-d566-46c4-9d39-f8130112bdf7" >
 			<when expression='#[vars.prepareRequestURI == "timezone"]'>
-				<http:request method="GET" doc:name="Request" doc:id="b39afd75-c8ec-422c-9c0b-02bf45592c4d" config-ref="WorldTime" path="#[vars.prepareRequestURI]" />
+				<ee:cache doc:name="Cache" doc:id="a1c278a0-9565-4ce3-9f05-33a8420ad880" >
+					<http:request method="GET" doc:name="Request" doc:id="b39afd75-c8ec-422c-9c0b-02bf45592c4d" config-ref="WorldTime" path="#[vars.prepareRequestURI]" />
+				</ee:cache>
 				<ee:transform doc:name="Transform Message" doc:id="e2043b72-2f2b-47ec-8d40-6c9d3a5ac00e">
 					<ee:message>
 						<ee:set-payload><![CDATA[%dw 2.0
