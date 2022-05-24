@@ -17,8 +17,8 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 								<ee:set-payload ><![CDATA[%dw 2.0
 output application/xml
 ---
-"response" : {
-	"worldtime" : payload	
+"worldtime" : {
+	"timezone" : payload	
 }
 ]]></ee:set-payload>
 							</ee:message>
