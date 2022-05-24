@@ -28,7 +28,7 @@ output application/xml
 						<ee:transform doc:name="Transform Message" doc:id="b8443d2d-0637-425d-8ab3-f4e6d927376a" >
 							<ee:message >
 								<ee:set-payload ><![CDATA[%dw 2.0
-output application/csv
+output application/dw
 ---
 payload]]></ee:set-payload>
 							</ee:message>
@@ -48,6 +48,16 @@ payload]]></ee:set-payload>
 						<parse-template doc:name="Parse Template" doc:id="fa688b2f-c334-43c0-b5f8-e206233e0e3a" location="html\list.html"/>
 					</otherwise>
 				</choice>
+				<ee:transform doc:name="Transform Message" doc:id="e2043b72-2f2b-47ec-8d40-6c9d3a5ac00e">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/dw
+---
+payload map( (item, index) -> item splitBy("/") filter(( filterItem, filterIndex ) -> filterItem != null)
+
+)]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
 			</when>
 		</choice>
 	</flow>
