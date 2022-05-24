@@ -10,6 +10,14 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 		<choice doc:name="Choice" doc:id="8bef6fd5-d566-46c4-9d39-f8130112bdf7" >
 			<when expression='#[vars.prepareRequestURI == "timezone"]'>
 				<http:request method="GET" doc:name="Request" doc:id="b39afd75-c8ec-422c-9c0b-02bf45592c4d" config-ref="WorldTime" path="#[vars.prepareRequestURI]" />
+				<ee:transform doc:name="Transform Message" doc:id="e2043b72-2f2b-47ec-8d40-6c9d3a5ac00e">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/dw
+---
+payload map((mapItem, mapIndex ) -> mapItem splitBy("/")) map((i, v) -> i[0] ) distinctBy $]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
 				<choice doc:name="Choice" doc:id="fa9564b5-3324-4ab4-90db-c2df12020f7c" >
 					<when expression='#[vars.inputData.extension == "xml"]'>
 						<ee:transform doc:name="Transform Message" doc:id="361c6b5f-ca5f-4e1c-8281-5063919a4d27" >
@@ -48,16 +56,6 @@ payload]]></ee:set-payload>
 						<parse-template doc:name="Parse Template" doc:id="fa688b2f-c334-43c0-b5f8-e206233e0e3a" location="html\list.html"/>
 					</otherwise>
 				</choice>
-				<ee:transform doc:name="Transform Message" doc:id="e2043b72-2f2b-47ec-8d40-6c9d3a5ac00e">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/dw
----
-payload map( (item, index) -> item splitBy("/") filter(( filterItem, filterIndex ) -> filterItem != null)
-
-)]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
 			</when>
 		</choice>
 	</flow>
