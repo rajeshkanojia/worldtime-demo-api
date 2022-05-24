@@ -55,7 +55,7 @@ payload]]></ee:set-payload>
 						</ee:transform>
 					</when>
 					<otherwise>
-						<http:load-static-resource doc:name="Load static resource" doc:id="5435c2cc-7679-42b7-9eff-cffe0744d0e9" resourceBasePath='"C:\Users\Rajesh\AnypointStudio\studio-workspace\worldtime-demo-api\src\main\resources\html"'/>
+						<parse-template doc:name="Parse Template" doc:id="aca9ee9c-715c-4ceb-853c-ae5dec48e9dd" location="html\index.html"/>
 					</otherwise>
 				</choice>
 			</when>
