@@ -7,7 +7,7 @@
 	<table>
 		<tr><th>ID</th><th>timezone</th></tr>
 #[%dw 2.0
-output application/dw 
+output text/html
 ---
 
 payload map ((item, index) -> "<tr><td>" ++ (index+1) ++ "</td><td>" ++ item.timezone ++ "</td></tr>")
