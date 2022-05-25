@@ -79,7 +79,7 @@ output application/xml writeDeclaration=false
          },
          (payload map (item, index) -> {
 			li @(class: "nav-item"): {
-	        	a @(class: "nav-link", href: "javascript:void(0)"):{
+	        	a @(class: "nav-link collapsed", href: "javascript:void(0)"):{
 	          		i @(class: "bi bi-menu-button-wide"):{
 						span: item.timezone			          			
 	          		}
