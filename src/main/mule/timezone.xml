@@ -63,6 +63,27 @@ output application/json
 payload map((item, index) -> {"timezone": item}) ]]></ee:set-payload>
 							</ee:message>
 						</ee:transform>
+						<ee:transform doc:name="Transform Message" doc:id="bcfdcb6d-48b3-4d91-bbf6-8f27b6c542fd">
+							<ee:message>
+								<ee:set-payload><![CDATA[%dw 2.0
+output application/xml writeDeclaration=false
+---
+{
+    table @(style: "width:100%", border: "1"): {
+        tr: {
+            th @(bgcolor: "lightblue"): "ID",
+            th @(bgcolor: "lightblue"): "Time Zone",
+        },
+        (payload map (item, index) -> {
+            tr: {
+            	td: (index+1),
+                td: item.timezone,
+            }
+        })
+    }
+}]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
 						<parse-template doc:name="Parse Template" doc:id="aca9ee9c-715c-4ceb-853c-ae5dec48e9dd" location="html\list.html" outputMimeType="text/html"/>
 					</otherwise>
 				</choice>
