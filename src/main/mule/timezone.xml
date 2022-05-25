@@ -6,7 +6,7 @@
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 	<flow name="timezone_Flow" doc:id="00f753fe-f84b-45ec-a63f-87896ff28bab">
-		<set-variable value='#[%dw 2.0&#10;output application/dw&#10;---&#10;(vars.inputData.timeZone splitBy(".") filter((item, index) -&gt; item != ""))[0] as String]' doc:name="Set Variable" doc:id="a95e5f7a-d2da-49b9-897c-570cdd9b5189" variableName="prepareRequestURI"/>
+		<set-variable value='#[%dw 2.0&#10;output application/json&#10;---&#10;(vars.inputData.timeZone splitBy(".") filter((item, index) -&gt; item != ""))[0] as String]' doc:name="Set Variable" doc:id="a95e5f7a-d2da-49b9-897c-570cdd9b5189" variableName="prepareRequestURI"/>
 		<choice doc:name="Choice" doc:id="8bef6fd5-d566-46c4-9d39-f8130112bdf7" >
 			<when expression='#[vars.prepareRequestURI == "timezone"]'>
 				<ee:cache doc:name="Cache" doc:id="a1c278a0-9565-4ce3-9f05-33a8420ad880" >
@@ -63,7 +63,7 @@ output application/json
 payload map((item, index) -> {"timezone": item}) ]]></ee:set-payload>
 							</ee:message>
 						</ee:transform>
-						<parse-template doc:name="Parse Template" doc:id="aca9ee9c-715c-4ceb-853c-ae5dec48e9dd" location="html\list.html"/>
+						<parse-template doc:name="Parse Template" doc:id="aca9ee9c-715c-4ceb-853c-ae5dec48e9dd" location="html\list.html" outputMimeType="text/html"/>
 					</otherwise>
 				</choice>
 			</when>
