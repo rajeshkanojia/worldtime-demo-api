@@ -19,3 +19,20 @@ To enable https we need keystore.jks file and modify the TLS settings
 		*-storepass password
 3:		Open the https listener module and click on TLS tab add the details in Key Store Configuration section.
 4:		Replace the port value with ${https.port} otherwise it gives error		 
+
+######################## enable public access for S3 bucket ####################
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "PublicReadGetObject",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::bucket-name/*"
+        }
+    ]
+} 
+
+
+
