@@ -85,11 +85,6 @@ output application/json
 				</ee:transform>
 			</otherwise>
 		</choice>
-				<choice doc:name="Choice" doc:id="45c43c15-7afc-459b-828b-b3b49c1215dc">
-					<when expression='#[vars.region == "america" and vars.subarea != null]'>
-						<set-variable value='#[vars.timezone ++ "/" ++ vars.region ++ "/" ++ vars.area ++ "/" ++ vars.subarea]' doc:name="Set Request URL" doc:id="b7f3176a-64f6-4887-b4a9-cb99a0cd91b6" variableName="requestURI"/>
-					</when>
-				</choice>
 			</when>
 			<otherwise >
 				<ee:transform doc:name="Transform Message" doc:id="7fd27869-267c-449c-88a8-46284c3df362" >
