@@ -46,21 +46,10 @@ output application/json
 output application/json
 ---
 (attributes.requestUri splitBy("/") filter(value, index) -> value != "")[3]]]></ee:set-variable>
-				<ee:set-variable variableName="inputData" ><![CDATA[%dw 2.0
-output application/dw
-var requestUriArray = (attributes.requestUri splitBy("/") filter(( item, index ) -> item != ""))
-var sizeOfURI = sizeOf(requestUriArray)
-var responseExt = (requestUriArray[(sizeOfURI-1)] splitBy(".") filter((item, index) -> item != ""))
----
-{
-	"extension" : responseExt[1] as String default "html",
-	"timeZone"	: requestUriArray[0] as String default null,
-	"region"	: requestUriArray[1] as String default null,
-	"area"		: requestUriArray[2] as String default null,
-}]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<logger level="INFO" doc:name="Logger" doc:id="7e708a69-ea68-4df2-af96-48397addde77" message='#[%dw 2.0&#10;output application/json&#10;---&#10;{&#10;	"inputData" : vars.inputData,&#10;	"attributes" : attributes&#10;}]'/>
+		<set-variable value='#[%dw 2.0&#10;output application/dw&#10;var requestUriArray = (attributes.requestUri splitBy("/") filter(( item, index ) -&gt; item != ""))&#10;var sizeOfURI = sizeOf(requestUriArray)&#10;var responseExt = (requestUriArray[(sizeOfURI-1)] splitBy(".") filter((item, index) -&gt; item != ""))&#10;---&#10;{&#10;	"extension" : responseExt[1] as String default "html",&#10;	"timeZone"	: requestUriArray[0] as String default null,&#10;	"region"	: requestUriArray[1] as String default null,&#10;	"area"		: requestUriArray[2] as String default null,&#10;}]' doc:name="Set Variable" doc:id="961a49ee-db1e-4e04-abfc-03f6071f2bc9" variableName="inputData"/>
+		<logger level="INFO" doc:name="Logger" doc:id="7e708a69-ea68-4df2-af96-48397addde77" message='#[vars.inputData]'/>
 		<choice doc:name="Choice" doc:id="9cd5c3c7-b89b-4d3e-927f-b22808b317e3" >		
 			<when expression='#[vars.inputData.timeZone contains("timezone")]'>
 				<choice doc:name="Choice" doc:id="f06eaa5a-1cbb-4c03-8311-ceb5cbcab67d">
