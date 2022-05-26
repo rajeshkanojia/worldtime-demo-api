@@ -64,10 +64,6 @@ var responseExt = (requestUriArray[(sizeOfURI-1)] splitBy(".") filter((item, ind
 		<choice doc:name="Choice" doc:id="9cd5c3c7-b89b-4d3e-927f-b22808b317e3" >		
 			<when expression='#[vars.inputData.timeZone contains("timezone")]'>
 				<choice doc:name="Choice" doc:id="f06eaa5a-1cbb-4c03-8311-ceb5cbcab67d">
-				
-			<when expression="#[vars.area != null]">
-						<set-variable value='#[vars.timezone ++ "/" ++ vars.region ++ "/" ++ vars.area]' doc:name="Set Request URL" doc:id="60e10db8-02d8-4263-aeec-15fbf29d585e" variableName="requestURI" />
-			</when>
 			<when expression="#[vars.inputData.timeZone != null]">
 						<flow-ref doc:name="Flow Reference" doc:id="97e59658-ef3a-4020-b624-513b343765d6" name="timezone_Flow" />
 			</when>
@@ -80,7 +76,7 @@ var responseExt = (requestUriArray[(sizeOfURI-1)] splitBy(".") filter((item, ind
 						<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-"default"]]></ee:set-payload>
+{"message": "timezone default"}]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
 			</otherwise>
@@ -92,7 +88,9 @@ output application/json
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
-payload]]></ee:set-payload>
+{
+	"message" : "outer choice default."
+}]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
 			</otherwise>
