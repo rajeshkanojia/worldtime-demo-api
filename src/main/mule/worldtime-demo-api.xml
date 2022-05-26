@@ -67,7 +67,7 @@ var responseExt = (requestUriArray[(sizeOfURI-1)] splitBy(".") filter((item, ind
 			<when expression="#[vars.inputData.timeZone != null]">
 						<flow-ref doc:name="Flow Reference" doc:id="97e59658-ef3a-4020-b624-513b343765d6" name="timezone_Flow" />
 			</when>
-					<when expression="#[vars.inputData.region != null]" >
+					<when expression="#[(vars.inputData.region != null) AND (vars.inputData.timeZone != null)]" >
 						<flow-ref doc:name="Flow Reference" doc:id="7c35aef5-53fa-415b-8dfc-2548322778c9" name="region_Flow"/>
 					</when>
 					<otherwise>
