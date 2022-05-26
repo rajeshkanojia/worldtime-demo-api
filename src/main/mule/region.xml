@@ -13,5 +13,6 @@ output application/json
 payload]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+		<parse-template doc:name="Parse Template" doc:id="1080122d-9087-49bb-b151-f01193f2af11" location="html\region.html"/>
 	</flow>
 </mule>
