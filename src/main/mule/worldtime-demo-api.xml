@@ -84,5 +84,20 @@ output application/json
 				</ee:transform>
 			</otherwise>
 		</choice>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1e6476aa-bcc6-42a3-bbe8-0779fa5e86ba" type="ANY">
+				<ee:transform doc:name="Transform Message" doc:id="f1c17028-d0d7-4439-8b7f-5bfc21a0eb4b" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message" : "Region Flow",
+	"error" : error
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
 	</flow>
 </mule>

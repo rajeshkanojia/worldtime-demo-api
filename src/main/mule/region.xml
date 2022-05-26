@@ -15,5 +15,20 @@ output application/json
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="11f5011e-9856-4df6-9d1e-2fe9513ef5a9" type="ANY">
+				<ee:transform doc:name="Transform Message" doc:id="948efe54-5e90-4e93-8f1c-cfebbe7c8b25" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"message" : "Region Flow",
+	"error" : error
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
 	</flow>
 </mule>
