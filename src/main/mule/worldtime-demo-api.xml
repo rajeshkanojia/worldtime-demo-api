@@ -60,6 +60,7 @@ var responseExt = (requestUriArray[(sizeOfURI-1)] splitBy(".") filter((item, ind
 }]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="7e708a69-ea68-4df2-af96-48397addde77" message="#[vars.inputData]"/>
 		<choice doc:name="Choice" doc:id="9cd5c3c7-b89b-4d3e-927f-b22808b317e3" >		
 			<when expression='#[vars.inputData.timeZone contains("timezone")]'>
 				<choice doc:name="Choice" doc:id="f06eaa5a-1cbb-4c03-8311-ceb5cbcab67d">
