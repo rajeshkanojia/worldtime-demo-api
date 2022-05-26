@@ -79,7 +79,7 @@ output application/xml writeDeclaration=false
          },
          (payload map (item, index) -> {
 			li @(class: "nav-item"): {
-	        	a @(class: "nav-link collapsed", href: "https://worldtime-demo-api.us-e2.cloudhub.io/timezone/" ++ item.timezone):{
+	        	a @(class: "nav-link collapsed", href: lower("https://worldtime-demo-api.us-e2.cloudhub.io/timezone/" ++ item.timezone)):{
 	          		i @(class: "bi bi-menu-button-wide"):{
 						span: item.timezone			          			
 	          		}
