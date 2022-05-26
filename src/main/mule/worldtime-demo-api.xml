@@ -65,15 +65,14 @@ var responseExt = (requestUriArray[(sizeOfURI-1)] splitBy(".") filter((item, ind
 				<choice doc:name="Choice" doc:id="f06eaa5a-1cbb-4c03-8311-ceb5cbcab67d">
 				
 			<when expression="#[vars.area != null]">
-						<set-variable value='#[vars.timezone ++ "/" ++ vars.region ++ "/" ++ vars.area]' doc:name="Set Request URL" doc:id="60e10db8-02d8-4263-aeec-15fbf29d585e" variableName="requestURI"/>
-			</when>
-
-			<when expression="#[vars.region != null]">
-						<set-variable value='#[vars.timezone ++ "/" ++ vars.region]' doc:name="Set Request URL" doc:id="73aed4d0-f47a-4dc2-9d57-1767d351c27d" variableName="requestURI" />
+						<set-variable value='#[vars.timezone ++ "/" ++ vars.region ++ "/" ++ vars.area]' doc:name="Set Request URL" doc:id="60e10db8-02d8-4263-aeec-15fbf29d585e" variableName="requestURI" />
 			</when>
 			<when expression="#[vars.inputData.timeZone != null]">
 						<flow-ref doc:name="Flow Reference" doc:id="97e59658-ef3a-4020-b624-513b343765d6" name="timezone_Flow" />
 			</when>
+					<when expression="#[vars.region != null]" >
+						<flow-ref doc:name="Flow Reference" doc:id="7c35aef5-53fa-415b-8dfc-2548322778c9" name="region_Flow"/>
+					</when>
 					<otherwise>
 				<ee:transform doc:name="Transform Message" doc:id="3e1cb4fb-3df9-46d8-8102-76e00d61c724">
 					<ee:message>
