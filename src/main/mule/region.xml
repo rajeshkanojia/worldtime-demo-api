@@ -5,16 +5,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<flow name="region_Flow" doc:id="31645d6f-d039-4479-9f21-e56cb5c97c6a" >
-		<ee:transform doc:name="Transform Message" doc:id="d1e5f242-2a2c-4aa9-b78a-2f9a4ed52b4e" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-{
-	"message" : "Hello, I am from region flow."
-}]]></ee:set-payload>
-			</ee:message>
-		</ee:transform>
+		<parse-template doc:name="Parse Template" doc:id="ae5ceb3b-27f9-4fbf-ae42-e3c4632db437" location="html\region.html"/>
 		<error-handler >
 			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="11f5011e-9856-4df6-9d1e-2fe9513ef5a9" type="ANY">
 				<ee:transform doc:name="Transform Message" doc:id="948efe54-5e90-4e93-8f1c-cfebbe7c8b25" >

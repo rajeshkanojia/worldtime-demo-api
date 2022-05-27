@@ -1,71 +1,126 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
-	<flow name="timezone_Flow" doc:id="00f753fe-f84b-45ec-a63f-87896ff28bab">
-		<set-variable value='#[%dw 2.0&#10;output application/json&#10;---&#10;(vars.inputData.timeZone splitBy(".") filter((item, index) -&gt; item != ""))[0] as String]' doc:name="Set Variable" doc:id="a95e5f7a-d2da-49b9-897c-570cdd9b5189" variableName="prepareRequestURI"/>
-		<choice doc:name="Choice" doc:id="8bef6fd5-d566-46c4-9d39-f8130112bdf7" >
-			<when expression='#[vars.prepareRequestURI == "timezone"]'>
-				<ee:cache doc:name="Cache" doc:id="a1c278a0-9565-4ce3-9f05-33a8420ad880" filterExpression="#[payload]">
-					<http:request method="GET" doc:name="Request" doc:id="b39afd75-c8ec-422c-9c0b-02bf45592c4d" config-ref="WorldTime" path="#[vars.prepareRequestURI]" />
-				</ee:cache>
-				<ee:transform doc:name="Transform Message" doc:id="e2043b72-2f2b-47ec-8d40-6c9d3a5ac00e">
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<os:object-store name="Object_store" doc:name="Object store" doc:id="22c55bc5-2b16-4f75-9078-5bd5519df9b5" />
+	<flow name="timezone_main_flow" doc:id="3323ac1f-1a11-4baf-9171-0b927ccd493a" >
+		<set-variable value='#[%dw 2.0&#10;output application/json&#10;import * from dw::core::Arrays&#10;var uri = (attributes.requestPath default "timezone") splitBy("/") filter((item, index) -&gt; item != "")&#10;var byPass = ["cet", "cst6cdt", "eet", "est", "est5edt", "hst", "met", "mst", "mst7mdt", "pst8pdt", "wet"]&#10;var extension = ((attributes.requestPath default "html") splitBy(".") filter((item, index) -&gt; item != ""))[1] default "html"&#10;---&#10;{&#10;	"extension" : extension,&#10;	"timeZone" : uri[0],&#10;	"region" : uri[1],&#10;	"area" : uri[2]	&#10;}]' doc:name="uri data" doc:id="07425d13-ca5a-4357-80cd-89c6782bb978" variableName="uriData"/>
+		<choice doc:name="Choice" doc:id="9247d13e-4bd9-49cb-973a-c913d0cb808d" >
+			<when expression='#[!isBlank(vars.uriData.area)]'>
+				<set-variable value='#["timezone/" ++ vars.uriData.region ++ "/" ++ vars.uriData.area]' doc:name="setRequestURI" doc:id="e4b941fe-1d09-4754-bd61-aae44667eaaa" variableName="setRequestURI"/>
+				<flow-ref doc:name="Flow Reference" doc:id="0ac2d3cb-3492-4d78-bb28-4c10152f0f7b" name="make_request_sub_flow"/>
+				<ee:transform doc:name="Transform Message" doc:id="23f79e11-af86-46ab-8c78-72efad8da62a">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+				<ee:transform doc:name="Transform Message" doc:id="6fe04f09-f9d5-4425-9412-2335d6dacd7c" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml writeDeclaration=false
+---
+{
+div @(class:"card"):{
+ div @(class:"card-body"):{
+   table @(class:"table table-striped"):{
+    thead:{
+     tr @(class:"table-primary"):{
+      th @(scope:"col"):"title",
+      th @(scope:"col"):"value",
+     }
+    },    
+    tbody:{
+    (payload mapObject(item, key, index) -> {
+    	      tr:{
+       th @(scope:"col"):key,
+       th @(scope:"col"):item,
+     }
+    	
+    })	
+	}
+   }
+   
+   
+   }
+   }
+   
+   }]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<os:retrieve doc:name="Retrieve" doc:id="2472f81b-fa5e-40a5-9563-6f7d4129e994" key='#["timezoneOS"]' objectStore="Object_store" target="OSTimeZone">
+					<os:default-value ><![CDATA[""]]></os:default-value>
+				</os:retrieve>
+				<parse-template doc:name="Parse Template" doc:id="85e4841d-dbb9-467a-9db4-25315915954b" location="html\area.html"/>
+			</when>
+			<when expression='#[!isBlank(vars.uriData.region)]'>
+			
+				<set-variable value='#["timezone/" ++ vars.uriData.region]' doc:name="setRequestURI" doc:id="b0491fec-a06c-4ae5-bf52-ac522c853711" variableName="setRequestURI" />
+				<flow-ref doc:name="Flow Reference" doc:id="93791c21-cd3c-4dd4-a2f3-67d463c99c6b" name="make_request_sub_flow"/>
+				<ee:transform doc:name="Transform Message" doc:id="e0d1962a-0bf1-4eb3-95e2-e2062cea1a1d" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+output application/json
+---
+(payload map((mapItem, mapIndex ) -> mapItem splitBy("/")) map((i, v) ->  i[1] ++ "/" ++ (i[2] default "" )) distinctBy $)]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<ee:transform doc:name="Transform Message" doc:id="964f6477-cd8a-4c5d-a1c2-70e4ce0f3930">
 					<ee:message>
 						<ee:set-payload><![CDATA[%dw 2.0
+output application/xml writeDeclaration=false
+---
+{
+	div @(class:"card"):{
+	  div @(class:"card-body"):{
+	    h5 @(class:"card-title") : "Clean list group",
+	    ul @(class:"list-group list-group-flush"):{
+	     (payload map(item, index) -> {
+	      li @(class:"list-group-item"): {
+	      	a @(class: "nav-link collapsed", href: lower("http://localhost:8081/" ++ vars.setRequestURI ++ "/" ++ item)):{
+	          		i @(class: "bi bi-folder-fill"):{
+						span: item			          			
+	          		}
+	          	}
+	      	
+	      	}
+	     })
+	    }
+	  }
+	}
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<async doc:name="Async" doc:id="159feeb1-380b-47d8-9a0e-3dc15ee79ae3" >
+					<os:store doc:name="Store" doc:id="cf18e85e-12d6-4f5f-8f91-a5c47f6dcb27" key="#[vars.setRequestURI]" objectStore="Object_store" failIfPresent="true" />
+				</async>
+				<os:retrieve doc:name="Retrieve" doc:id="1b7bb788-949b-4149-9118-3dbee5594cdd" key='#["timezoneOS"]' target="OSTimeZone" objectStore="Object_store">
+					<os:default-value ><![CDATA[""]]></os:default-value>
+				</os:retrieve>
+				<parse-template doc:name="Parse Template" doc:id="55aa5b21-e588-4413-8665-096cb2f3ab88" location="html\region.html"/>
+			</when>
+			<otherwise >
+				<set-variable value='#["timezone"]' doc:name="setRequestURI" doc:id="b35e99f9-6d22-4974-aa91-7d7199e42ec1" variableName="setRequestURI" />
+				<flow-ref doc:name="Flow Reference" doc:id="bc2ec809-7953-4576-a966-d7d53388a983" name="make_request_sub_flow"/>
+				<ee:transform doc:name="Transform Message" doc:id="aefe9ba5-b317-4198-ab69-cf3050ca8046">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 payload map((mapItem, mapIndex ) -> mapItem splitBy("/")) map((i, v) -> i[0] ) distinctBy $]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-				<choice doc:name="Choice" doc:id="fa9564b5-3324-4ab4-90db-c2df12020f7c" >
-					<when expression='#[vars.inputData.extension == "xml"]'>
-						<ee:transform doc:name="Transform Message" doc:id="361c6b5f-ca5f-4e1c-8281-5063919a4d27" >
-							<ee:message >
-								<ee:set-payload ><![CDATA[%dw 2.0
-output application/xml
----
-"worldtime" : {
-	"timezone" : payload	
-}
-]]></ee:set-payload>
-							</ee:message>
-						</ee:transform>
-					</when>
-					<when expression='#[vars.inputData.extension == "csv"]'>
-						<ee:transform doc:name="Transform Message" doc:id="b8443d2d-0637-425d-8ab3-f4e6d927376a" >
-							<ee:message >
-								<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-payload]]></ee:set-payload>
-							</ee:message>
-						</ee:transform>
-					</when>
-					<when expression='#[vars.inputData.extension == "json"]'>
-						<ee:transform doc:name="Transform Message" doc:id="db49ab8a-6961-4135-8cb1-32cb785f7214" >
-							<ee:message >
-								<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-{timezone: payload}]]></ee:set-payload>
-							</ee:message>
-						</ee:transform>
-					</when>
-					<otherwise>
-						<ee:transform doc:name="Transform Message" doc:id="6f55ae80-3572-445a-80a0-3e5cb0a76200">
-							<ee:message>
-								<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-payload map((item, index) -> {"timezone": item}) ]]></ee:set-payload>
-							</ee:message>
-						</ee:transform>
-						<ee:transform doc:name="Transform Message" doc:id="bcfdcb6d-48b3-4d91-bbf6-8f27b6c542fd">
-							<ee:message>
-								<ee:set-payload><![CDATA[%dw 2.0
+			</ee:message>
+		</ee:transform>
+				<ee:transform doc:name="Transform Message" doc:id="27b4e0db-822c-4d58-8a71-3373e28f80de" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
 output application/xml writeDeclaration=false
 ---
 {
@@ -79,9 +134,9 @@ output application/xml writeDeclaration=false
          },
          (payload map (item, index) -> {
 			li @(class: "nav-item"): {
-	        	a @(class: "nav-link collapsed", href: lower("https://worldtime-demo-api.us-e2.cloudhub.io/timezone/" ++ item.timezone)):{
+	        	a @(class: "nav-link collapsed", href: lower("http://localhost:8081/timezone/" ++ item)):{
 	          		i @(class: "bi bi-menu-button-wide"):{
-						span: item.timezone			          			
+						span: item			          			
 	          		}
 	          	}
 	         }	
@@ -89,27 +144,16 @@ output application/xml writeDeclaration=false
 	}
 
 }]]></ee:set-payload>
-							</ee:message>
-						</ee:transform>
-						<parse-template doc:name="Parse Template" doc:id="aca9ee9c-715c-4ceb-853c-ae5dec48e9dd" location="html\index.html"/>
-					</otherwise>
-				</choice>
-			</when>
-		</choice>
-		<error-handler >
-			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="7b355352-4947-498c-a29f-c3e1827064be" type="ANY">
-				<ee:transform doc:name="Transform Message" doc:id="4303325c-a4cc-491c-998b-260d2464cd91" >
-					<ee:message >
-						<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-{
-	"message" : "Region Flow",	
-	"error" : error
-}]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
-			</on-error-propagate>
-		</error-handler>
+				<async doc:name="Async" doc:id="446ee4f4-2030-491f-b763-5d16477867eb" >
+					<os:store doc:name="Store" doc:id="cf0a4402-e977-4ea0-a67e-8a46383f8a9c" key='#["timezoneOS"]' objectStore="Object_store" failIfPresent="true" />
+				</async>
+				<parse-template doc:name="Parse Template" doc:id="45a876c0-d335-4e6c-9a88-db6194f81dd9" location="html\index.html"/>
+			</otherwise>
+		</choice>
 	</flow>
+	<sub-flow name="make_request_sub_flow" doc:id="7c6ab9f9-5869-4931-802d-6dda8bed84da" >
+		<http:request method="GET" doc:name="Request" doc:id="b39afd75-c8ec-422c-9c0b-02bf45592c4d" config-ref="WorldTime" path='#[vars.setRequestURI]'/>
+	</sub-flow>
 </mule>
