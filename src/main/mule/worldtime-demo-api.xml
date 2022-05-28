@@ -11,6 +11,9 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="a304b13b-c56c-409a-810f-2fb8c9705dbe" basePath="/">
 		<http:listener-connection host="0.0.0.0" port="${https.port}" protocol="HTTPS">
+			<tls:context >
+				<tls:key-store keyPassword="password" password="password" />
+			</tls:context>
 		</http:listener-connection>
 	</http:listener-config>
 	<http:request-config name="WorldTime" doc:name="HTTP Request configuration" doc:id="3be08ae7-712c-4ddf-8632-9f588c75cccc" basePath="${secure::worldtime.basepath}" >
