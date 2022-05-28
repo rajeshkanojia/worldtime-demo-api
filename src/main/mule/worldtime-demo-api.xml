@@ -12,7 +12,7 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="a304b13b-c56c-409a-810f-2fb8c9705dbe" basePath="/">
 		<http:listener-connection host="0.0.0.0" port="${https.port}" protocol="HTTPS">
 			<tls:context >
-				<tls:key-store keyPassword="password" password="password" />
+				<tls:key-store keyPassword="Password" password="Password" />
 			</tls:context>
 		</http:listener-connection>
 	</http:listener-config>
