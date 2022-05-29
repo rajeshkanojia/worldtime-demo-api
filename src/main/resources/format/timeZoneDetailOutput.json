@@ -1,0 +1,17 @@
+{
+    "Timezone": "CET",
+    "Abbreviation": "CEST",
+    "Client IP": "103.77.43.246",
+    "Datetime": "2022-05-29T14:20:24.962869+02:00",
+    "Day of week": 0,
+    "Day of year": 149,
+    "DST": true,
+    "DST from": "2022-03-27T01:00:00+00:00",
+    "DST offset": 3600,
+    "DST until": "2022-10-30T01:00:00+00:00",
+    "Raw offset": 3600,
+    "Unixtime": 1653826824,
+    "UTC datetime": "2022-05-29T12:20:24.962869+00:00",
+    "UTC offset": "+02:00",
+    "Week number": 21
+}

@@ -18,41 +18,54 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 				<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-payload
+{
+	Timezone: payload.timezone,
+	Abbreviation: payload.abbreviation,
+	"Client IP": payload.client_ip,
+	Datetime: payload.datetime,
+	"Day of week": payload.day_of_week,
+	"Day of year": payload.day_of_year,
+	DST: payload.dst,
+	"DST from": payload.dst_from,
+	"DST offset": payload.dst_offset,
+	"DST until": payload.dst_until,
+	"Raw offset": payload.raw_offset,
+	Unixtime: payload.unixtime,
+	"UTC datetime": payload.utc_datetime,
+	"UTC offset": payload.utc_offset,
+	"Week number":  payload.week_number
+}
 ]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-				<ee:transform doc:name="Transform Message" doc:id="6fe04f09-f9d5-4425-9412-2335d6dacd7c" >
-					<ee:message >
-						<ee:set-payload ><![CDATA[%dw 2.0
-output application/xml writeDeclaration=false
+				<ee:transform doc:name="JSON to XML" doc:id="203af64c-43a2-46f1-837b-a07f42676b0c">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+import * from dw::core::Strings
+output application/xml writeDeclaration = false
 ---
 {
-div @(class:"card"):{
- div @(class:"card-body"):{
-   table @(class:"table table-striped"):{
-    thead:{
-     tr @(class:"table-primary"):{
-      th @(scope:"col"):"title",
-      th @(scope:"col"):"value",
-     }
-    },    
-    tbody:{
-    (payload mapObject(item, key, index) -> {
-    	      tr:{
-       th @(scope:"col"):key,
-       th @(scope:"col"):item,
-     }
-    	
-    })	
+	div @(class: "card"): {
+		div @(class: "card-body"): {
+			table @(class: "table table-striped"): {
+				thead: {
+					tr @(class: "table-primary"): {
+						th @(scope: "col"): "title",
+						th @(scope: "col"): "value",
+					}
+				},
+				tbody: {
+					(payload mapObject(item, key, index) -> {
+						tr: {
+							th @(scope: "col"): key,
+							th @(scope: "col"): item,
+						}
+					})
+				}
+			}
+		}
 	}
-   }
-   
-   
-   }
-   }
-   
-   }]]></ee:set-payload>
+}]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
 				<os:retrieve doc:name="Retrieve" doc:id="2472f81b-fa5e-40a5-9563-6f7d4129e994" key='#["timezoneOS"]' objectStore="Object_store" target="OSTimeZone">
@@ -76,6 +89,7 @@ output application/json
 				<ee:transform doc:name="Transform Message" doc:id="964f6477-cd8a-4c5d-a1c2-70e4ce0f3930">
 					<ee:message>
 						<ee:set-payload><![CDATA[%dw 2.0
+import * from dw::core::Strings
 output application/xml writeDeclaration=false
 ---
 {
@@ -87,7 +101,8 @@ output application/xml writeDeclaration=false
 	      li @(class:"list-group-item"): {
 	      	a @(class: "nav-link collapsed", href: lower("http://localhost:8081/" ++ vars.setRequestURI ++ "/" ++ item)):{
 	          		i @(class: "bi bi-folder-fill"):{
-						span: item			          			
+//						span: item replace "/" with("")
+						span: if(item endsWith "/") item replace "/" with("") else item 
 	          		}
 	          	}
 	      	
@@ -126,7 +141,7 @@ output application/xml writeDeclaration=false
 {
 	ul @(class: "sidebar-nav", id: "sidebar-nav"): {
 		li @(class: "nav-item"): {
-        	a @(class: "nav-link", href: "javascript:void(0)"):{
+        	a @(class: "nav-link collapsed", href: "javascript:void(0)"):{
           		i @(class: "bi bi-grid"):{
 					span: "Dashboard",					          			
           		}
@@ -157,5 +172,44 @@ output application/xml writeDeclaration=false
 		<set-variable value='#[%dw 2.0&#10;import * from dw::core::Arrays&#10;output application/json&#10;var uriElement = (attributes.requestPath splitBy("/") filter((item, index) -&gt; item != ""))&#10;var byPass = ["cet","cst6cdt","eet","est","est5edt","hst","met","mst","mst7mdt","pst8pdt","wet"] indexOf uriElement[1] &#10;var subArea = ["argentina", "indiana", "kentucky", "north_dakota"] indexOf uriElement[2]&#10;---&#10;//uriElement&#10;if(byPass &gt;= 0) &#10; ("timezone/" ++ uriElement[1]) &#10;else if(subArea &gt;= 0)&#10; (attributes.requestPath)&#10;else &#10; vars.setRequestURI]' doc:name="Set Variable" doc:id="5d3c8ae7-971f-420b-ad36-c5f5a1bd308f" variableName="finalRequestURI"/>
 		<logger level="INFO" doc:name="Logger" doc:id="5c139148-9130-4be6-b919-bd9a47600615" message='#[vars.finalRequestURI]' />
 		<http:request method="GET" doc:name="Request" doc:id="b39afd75-c8ec-422c-9c0b-02bf45592c4d" config-ref="WorldTime" path="#[vars.finalRequestURI]" />
+	</sub-flow>
+	<sub-flow name="timezone_sub_flow" doc:id="e09761c8-3cfd-4dc6-95db-a4dab27e095a" >
+		<http:request method="GET" doc:name="Request" doc:id="bdd1a4e5-d413-41fe-a350-beab89db1d06" config-ref="WorldTime" path='#["/timezone"]'/>
+		<ee:transform doc:name="Transform Message" doc:id="cebd7214-2d54-4812-b6a5-73af88028c77" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map((mapItem, mapIndex ) -> mapItem splitBy("/")) map((i, v) -> i[0] ) distinctBy $]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="2cefd16e-cb1d-41be-9192-c6af9cd5da99" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml writeDeclaration=false
+---
+{
+	ul @(class: "sidebar-nav", id: "sidebar-nav"): {
+		li @(class: "nav-item"): {
+        	a @(class: "nav-link", href: "javascript:void(0)"):{
+          		i @(class: "bi bi-grid"):{
+					span: "Dashboard",					          			
+          		}
+          	}
+         },
+         (payload map (item, index) -> {
+			li @(class: "nav-item"): {
+	        	a @(class: "nav-link collapsed", href: lower("http://localhost:8081/timezone/" ++ item)):{
+	          		i @(class: "bi bi-menu-button-wide"):{
+						span: item			          			
+	          		}
+	          	}
+	         }	
+         }),
+	}
+
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 	</sub-flow>
 </mule>

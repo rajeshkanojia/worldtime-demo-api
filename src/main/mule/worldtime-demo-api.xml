@@ -12,7 +12,7 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="a304b13b-c56c-409a-810f-2fb8c9705dbe" basePath="/">
 		<http:listener-connection host="0.0.0.0" port="${https.port}" protocol="HTTPS">
 			<tls:context >
-				<tls:key-store keyPassword="Password" password="Password" />
+				<tls:key-store type="jks" keyPassword="password" password="password" />
 			</tls:context>
 		</http:listener-connection>
 	</http:listener-config>
@@ -28,6 +28,18 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 		<choice doc:name="Choice" doc:id="9cd5c3c7-b89b-4d3e-927f-b22808b317e3" >
 			<when expression='#[attributes.requestUri contains("timezone")]'>
 				<flow-ref doc:name="Flow Reference" doc:id="9e76d727-8c5a-4bf8-b9bb-572b8da3ce9d" name="timezone_main_flow"/>
+			</when>
+			<when expression='#[attributes.requestUri contains("faq")]'>
+				<ee:transform doc:name="Transform Message" doc:id="af2d1bb5-c59c-4d5f-8fd4-7f06ecd57b91" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<parse-template doc:name="Parse Template" doc:id="adff65f1-ca85-4939-ac44-226605d334fc" location="html\faq.html"/>
 			</when>
 			<otherwise >
 				<os:retrieve doc:name="Retrieve" doc:id="5a341241-60fb-4a5c-ad18-7d4409adbadd" key='#["timezoneOS"]' objectStore="Object_store" target="OStimezone">
