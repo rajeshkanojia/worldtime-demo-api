@@ -8,7 +8,19 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
 	<os:object-store name="Object_store" doc:name="Object store" doc:id="22c55bc5-2b16-4f75-9078-5bd5519df9b5" />
 	<flow name="timezone_main_flow" doc:id="3323ac1f-1a11-4baf-9171-0b927ccd493a" >
-		<set-variable value='#[%dw 2.0&#10;output application/json&#10;import * from dw::core::Arrays&#10;var uri = (attributes.requestPath default "timezone") splitBy("/") filter((item, index) -&gt; item != "")&#10;var byPass = ["cet", "cst6cdt", "eet", "est", "est5edt", "hst", "met", "mst", "mst7mdt", "pst8pdt", "wet"] indexOf uri[1]&#10;var extension = ((attributes.requestPath default "html") splitBy(".") filter((item, index) -&gt; item != ""))[1] default "html"&#10;---&#10;{&#10;	"extension" : extension,&#10;	"timeZone" : uri[0],&#10;	"region" : uri[1],&#10;	"area" :  if(byPass &gt;= 0) (uri[1]) else (uri[2]),&#10;}]' doc:name="uri data" doc:id="07425d13-ca5a-4357-80cd-89c6782bb978" variableName="uriData"/>
+		<set-variable value='#[%dw 2.0
+&#10;output application/json
+&#10;import * from dw::core::Arrays
+&#10;var uri = (attributes.requestPath default "timezone") splitBy("/") filter((item, index) -&gt; item != "")
+&#10;var byPass = ["cet", "cst6cdt", "eet", "est", "est5edt", "hst", "met", "mst", "mst7mdt", "pst8pdt", "wet"] indexOf uri[1]
+&#10;var extension = ((attributes.requestPath default "html") splitBy(".") filter((item, index) -&gt; item != ""))[1] default "html"
+&#10;---
+&#10;{
+&#10;	"extension" : extension,
+&#10;	"timeZone" : uri[0],
+&#10;	"region" : uri[1],
+&#10;	"area" :  if(byPass &gt;= 0) (uri[1]) else (uri[2]),
+&#10;}]' doc:name="uri data" doc:id="07425d13-ca5a-4357-80cd-89c6782bb978" variableName="uriData"/>
 		<choice doc:name="Choice" doc:id="9247d13e-4bd9-49cb-973a-c913d0cb808d" >
 			<when expression='#[!isBlank(vars.uriData.area)]'>
 				<set-variable value='#["timezone/" ++ vars.uriData.region ++ "/" ++ vars.uriData.area]' doc:name="setRequestURI" doc:id="e4b941fe-1d09-4754-bd61-aae44667eaaa" variableName="setRequestURI"/>
@@ -99,7 +111,7 @@ output application/xml writeDeclaration=false
 	    ul @(class:"list-group list-group-flush"):{
 	     (payload map(item, index) -> {
 	      li @(class:"list-group-item"): {
-	      	a @(class: "nav-link collapsed", href: lower("http://localhost:8081/" ++ vars.setRequestURI ++ "/" ++ item)):{
+	      	a @(class: "nav-link collapsed", href: lower("https://worldtime-demo-api.us-e2.cloudhub.io/" ++ vars.setRequestURI ++ "/" ++ item)):{
 	          		i @(class: "bi bi-folder-fill"):{
 //						span: item replace "/" with("")
 						span: if(item endsWith "/") item replace "/" with("") else item 
@@ -149,7 +161,7 @@ output application/xml writeDeclaration=false
          },
          (payload map (item, index) -> {
 			li @(class: "nav-item"): {
-	        	a @(class: "nav-link collapsed", href: lower("http://localhost:8081/timezone/" ++ item)):{
+	        	a @(class: "nav-link collapsed", href: lower("https://worldtime-demo-api.us-e2.cloudhub.io/timezone/" ++ item)):{
 	          		i @(class: "bi bi-menu-button-wide"):{
 						span: item			          			
 	          		}
@@ -169,7 +181,20 @@ output application/xml writeDeclaration=false
 		</choice>
 	</flow>
 	<sub-flow name="make_request_sub_flow" doc:id="7c6ab9f9-5869-4931-802d-6dda8bed84da" >
-		<set-variable value='#[%dw 2.0&#10;import * from dw::core::Arrays&#10;output application/json&#10;var uriElement = (attributes.requestPath splitBy("/") filter((item, index) -&gt; item != ""))&#10;var byPass = ["cet","cst6cdt","eet","est","est5edt","hst","met","mst","mst7mdt","pst8pdt","wet"] indexOf uriElement[1] &#10;var subArea = ["argentina", "indiana", "kentucky", "north_dakota"] indexOf uriElement[2]&#10;---&#10;//uriElement&#10;if(byPass &gt;= 0) &#10; ("timezone/" ++ uriElement[1]) &#10;else if(subArea &gt;= 0)&#10; (attributes.requestPath)&#10;else &#10; vars.setRequestURI]' doc:name="Set Variable" doc:id="5d3c8ae7-971f-420b-ad36-c5f5a1bd308f" variableName="finalRequestURI"/>
+		<set-variable value='#[%dw 2.0
+&#10;import * from dw::core::Arrays
+&#10;output application/json
+&#10;var uriElement = (attributes.requestPath splitBy("/") filter((item, index) -&gt; item != ""))
+&#10;var byPass = ["cet","cst6cdt","eet","est","est5edt","hst","met","mst","mst7mdt","pst8pdt","wet"] indexOf uriElement[1] 
+&#10;var subArea = ["argentina", "indiana", "kentucky", "north_dakota"] indexOf uriElement[2]
+&#10;---
+&#10;//uriElement
+&#10;if(byPass &gt;= 0) 
+&#10; ("timezone/" ++ uriElement[1]) 
+&#10;else if(subArea &gt;= 0)
+&#10; (attributes.requestPath)
+&#10;else 
+&#10; vars.setRequestURI]' doc:name="Set Variable" doc:id="5d3c8ae7-971f-420b-ad36-c5f5a1bd308f" variableName="finalRequestURI"/>
 		<logger level="INFO" doc:name="Logger" doc:id="5c139148-9130-4be6-b919-bd9a47600615" message='#[vars.finalRequestURI]' />
 		<http:request method="GET" doc:name="Request" doc:id="b39afd75-c8ec-422c-9c0b-02bf45592c4d" config-ref="WorldTime" path="#[vars.finalRequestURI]" />
 	</sub-flow>
@@ -199,7 +224,7 @@ output application/xml writeDeclaration=false
          },
          (payload map (item, index) -> {
 			li @(class: "nav-item"): {
-	        	a @(class: "nav-link collapsed", href: lower("http://localhost:8081/timezone/" ++ item)):{
+	        	a @(class: "nav-link collapsed", href: lower("https://worldtime-demo-api.us-e2.cloudhub.io/timezone/" ++ item)):{
 	          		i @(class: "bi bi-menu-button-wide"):{
 						span: item			          			
 	          		}
