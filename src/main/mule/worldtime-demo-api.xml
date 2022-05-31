@@ -23,23 +23,13 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 		<secure-properties:encrypt algorithm="Blowfish" />
 	</secure-properties:config>
 	<configuration-properties doc:name="Configuration properties" doc:id="e987f261-9e01-411a-8c19-2682fb55af5b" file="config.yaml" />
+	<global-property doc:name="Global Property" doc:id="2fd64c51-79db-444a-b15c-bed03efb8f36" name="env" value="localhost" />
+	<configuration-properties doc:name="Configuration properties" doc:id="40edaf28-976e-4233-8374-3da0f6c984c8" file="localhost-site-setting.yaml" />
 	<flow name="worldtime-demo-apiFlow" doc:id="76514ca3-0fea-466c-a15b-d76e70c9c612" >
 		<http:listener doc:name="Listener" doc:id="b3f9a7b4-98b5-49c3-bbe8-4d29295b00bb" config-ref="HTTP_Listener_config" path="/*"/>
 		<choice doc:name="Choice" doc:id="9cd5c3c7-b89b-4d3e-927f-b22808b317e3" >
 			<when expression='#[attributes.requestUri contains("timezone")]'>
 				<flow-ref doc:name="Flow Reference" doc:id="9e76d727-8c5a-4bf8-b9bb-572b8da3ce9d" name="timezone_main_flow"/>
-			</when>
-			<when expression='#[attributes.requestUri contains("faq")]'>
-				<ee:transform doc:name="Transform Message" doc:id="af2d1bb5-c59c-4d5f-8fd4-7f06ecd57b91" >
-					<ee:message >
-						<ee:set-payload ><![CDATA[%dw 2.0
-output application/java
----
-{
-}]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-				<parse-template doc:name="Parse Template" doc:id="adff65f1-ca85-4939-ac44-226605d334fc" location="html\faq.html"/>
 			</when>
 			<otherwise >
 				<os:retrieve doc:name="Retrieve" doc:id="5a341241-60fb-4a5c-ad18-7d4409adbadd" key='#["timezoneOS"]' objectStore="Object_store" target="OStimezone">

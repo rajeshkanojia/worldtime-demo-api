@@ -83,6 +83,7 @@ output application/xml writeDeclaration = false
 				<os:retrieve doc:name="Retrieve" doc:id="2472f81b-fa5e-40a5-9563-6f7d4129e994" key='#["timezoneOS"]' objectStore="Object_store" target="OSTimeZone">
 					<os:default-value ><![CDATA[""]]></os:default-value>
 				</os:retrieve>
+				<flow-ref doc:name="Flow Reference" doc:id="97e75f85-aec7-4a14-a96c-81c8b770ff7f" name="timezone_sub_flow" target="OSTimeZone"/>
 				<parse-template doc:name="Parse Template" doc:id="85e4841d-dbb9-467a-9db4-25315915954b" location="html\area.html"/>
 			</when>
 			<when expression='#[!isBlank(vars.uriData.region)]'>
@@ -132,6 +133,7 @@ output application/xml writeDeclaration=false
 				<os:retrieve doc:name="Retrieve" doc:id="1b7bb788-949b-4149-9118-3dbee5594cdd" key='#["timezoneOS"]' target="OSTimeZone" objectStore="Object_store">
 					<os:default-value ><![CDATA[""]]></os:default-value>
 				</os:retrieve>
+				<flow-ref doc:name="Flow Reference" doc:id="4b0542b9-db8c-466c-9362-d65027a37f33" name="make_request_sub_flow" target="OSTimeZone"/>
 				<parse-template doc:name="Parse Template" doc:id="55aa5b21-e588-4413-8665-096cb2f3ab88" location="html\region.html"/>
 			</when>
 			<otherwise >
@@ -199,18 +201,20 @@ output application/xml writeDeclaration=false
 		<http:request method="GET" doc:name="Request" doc:id="b39afd75-c8ec-422c-9c0b-02bf45592c4d" config-ref="WorldTime" path="#[vars.finalRequestURI]" />
 	</sub-flow>
 	<sub-flow name="timezone_sub_flow" doc:id="e09761c8-3cfd-4dc6-95db-a4dab27e095a" >
-		<http:request method="GET" doc:name="Request" doc:id="bdd1a4e5-d413-41fe-a350-beab89db1d06" config-ref="WorldTime" path='#["/timezone"]'/>
-		<ee:transform doc:name="Transform Message" doc:id="cebd7214-2d54-4812-b6a5-73af88028c77" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
+		<choice doc:name="Choice" doc:id="a61ffb48-f637-4dcc-ae63-e62a4d6c3fa7" >
+			<when expression="#[!isBlank(vars.OSTimeZone)]">
+				<http:request method="GET" doc:name="Request" doc:id="bdd1a4e5-d413-41fe-a350-beab89db1d06" config-ref="WorldTime" path='#["/timezone"]' />
+				<ee:transform doc:name="Transform Message" doc:id="cebd7214-2d54-4812-b6a5-73af88028c77">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
 payload map((mapItem, mapIndex ) -> mapItem splitBy("/")) map((i, v) -> i[0] ) distinctBy $]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<ee:transform doc:name="Transform Message" doc:id="2cefd16e-cb1d-41be-9192-c6af9cd5da99" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
+				<ee:transform doc:name="Transform Message" doc:id="2cefd16e-cb1d-41be-9192-c6af9cd5da99">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
 output application/xml writeDeclaration=false
 ---
 {
@@ -236,5 +240,20 @@ output application/xml writeDeclaration=false
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+				<os:store doc:name="Store" doc:id="eccdd523-837c-4195-a70e-93c12ed9adee" key='#["timezoneOS"]' failIfPresent="true" objectStore="Object_store"/>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="10b791d2-099d-4e65-9938-3e6ecb462553" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"msg" : "Default"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
 	</sub-flow>
 </mule>

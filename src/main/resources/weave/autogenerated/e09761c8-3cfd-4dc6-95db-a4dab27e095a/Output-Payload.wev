@@ -1,4 +1,0 @@
-%dw 2.0
-
-type auto_e09761c8_3cfd_4dc6_95db_a4dab27e095a_Output_Payload = {| ul @(class: String {"MetadataFormat": "xml"}, id: String {"MetadataFormat": "xml"}): {| li @(class: String {"MetadataFormat": "xml"}): {| a @(class: String {"MetadataFormat": "xml"}, href: String {"MetadataFormat": "xml"}): {| i @(class: String {"MetadataFormat": "xml"}): {| span: String |} |} |} |} |}
-
